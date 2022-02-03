@@ -18,7 +18,7 @@ int C[125], cont[125];
 int main(){
     char T[200];
     scanf("%s", T);
-    int n = strlen(T), aux = 0, soma = 0;
+    int n = strlen(T), soma = 0;
     T[n] = '#';
     n++;
 		p_rot rot[n];
