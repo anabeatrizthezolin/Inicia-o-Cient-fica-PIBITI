@@ -43,7 +43,7 @@ int main(){
 
     for(int i = 35; i < 125; i++){
         if(C[i] > 0){
-	    cont[i] = aux;
+	    cont[i] = soma;
             soma += C[i];
         }
     }
