@@ -43,7 +43,11 @@ int main(){
 
     for(int i = 35; i < 125; i++){
         if(C[i] > 0){
+<<<<<<< HEAD
             cont[i] = soma;
+=======
+	    cont[i] = soma;
+>>>>>>> 853b86d9dafd9a418108e6025574130f4f502e5d
             soma += C[i];
         }
     }
