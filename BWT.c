@@ -18,7 +18,7 @@ int C[125], cont[125];
 int main(){
     char T[200];
     scanf("%s", T);
-    int n = strlen(T), aux = 0, soma = 0;
+    int n = strlen(T), soma = 0;
     T[n] = '#';
     n++;
 		p_rot rot[n];
@@ -43,10 +43,8 @@ int main(){
 
     for(int i = 35; i < 125; i++){
         if(C[i] > 0){
+            cont[i] = soma;
             soma += C[i];
-            C[i] = aux;
-            cont[i] = aux;
-            aux = soma;
         }
     }
     for(int i = 0; i < n; i++){
