@@ -111,7 +111,7 @@ int main(){
                 l = p[z-1].l;
             }
             i--; // para continuar analisando o intervalo [a, b] para o item anterior que pode ter LCP[i] == l.
-            for(int k = 0; k < 125; k++){ // paraa zerar os elentos do vetor para a próxima comparação
+            for(int k = 0; k < 125; k++){ // paraa zerar os elentos do vetor para a prÃ³xima comparaÃ§Ã£o
                 adicional[k] = 0;
             }
         }
@@ -125,7 +125,7 @@ int main(){
         }
         else if(LCP[i] > l){
             if(z > 1){
-                z--; // já que as variáveis do elemento anterior não correspondem com a condição de LCP[b+1] < l
+                z--; // jÃ¡ que as variÃ¡veis do elemento anterior nÃ£o correspondem com a condiÃ§Ã£o de LCP[b+1] < l
             }
             p[z].a = i-1;
             p[z].l = LCP[i];
