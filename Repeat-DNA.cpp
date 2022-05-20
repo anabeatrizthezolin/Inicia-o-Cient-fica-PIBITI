@@ -10,6 +10,7 @@ int C[125], adicional[125];
 int main(int argc, char* argv[]){
 
     int l_input = atoi(argv[4]);
+    int p_op = atoi(argv[5]);
 
     FILE* arquivo = fopen(argv[1], "rb"); // rb para arquivos binários
     fseek(arquivo, 0, SEEK_END);
@@ -37,7 +38,8 @@ int main(int argc, char* argv[]){
     l.push(l_input);
     h.push(0);
     printf("\n## Repeat DNA ##");
-    printf("\nTipo 1: \n");
+    printf("\nType 1: ");
+    int print = 0;
     for(int i = 0; i <= n; i++){
         if(LCP[i] == l_input && LCP[i-1] < l_input || LCP[i] > l_input){
             a.push(i-1);
@@ -52,7 +54,12 @@ int main(int argc, char* argv[]){
                 adicional[BWT[k]]++;
                 if(adicional[BWT[k]] == 1 && k > a.top()){
                     int j = SA[h.top()];
-                    printf("A repeticao comeca no indice %d de T\n", j);
+                    if(p_op == 1){
+                        printf("\nInicio no indice %d de T com tamanho %d", j, l_input);
+                    }
+                    else{
+                        print++;
+                    }
                     break;
                 }
             }
@@ -76,7 +83,11 @@ int main(int argc, char* argv[]){
             }
         }
     }
-    printf("\nTipo 2: \n");
+    if(p_op == 2){
+        printf("%d\n", print);
+        print = 0;
+    }
+    printf("\nType 2: ");
     for(int i = 0; i <= n; i++){
         if(LCP[i] == l_input && LCP[i-1] < l_input){
             a.push(i-1);
@@ -102,7 +113,12 @@ int main(int argc, char* argv[]){
             }
             if(tipo2 == 1){
                 int j = SA[a.top()];
-                printf("A repeticao comeca no indice %d de T\n", j);
+                if(p_op == 1){
+                    printf("\nInicio no indice %d de T com tamanho %d", j, l_input);
+                }
+                else{
+                    print++;
+                }         
             }
             a.pop();
             l.pop();
@@ -112,6 +128,11 @@ int main(int argc, char* argv[]){
             }
         }
     }
+if(p_op == 2){
+        printf("%d\n", print);
+        print = 0;
+    }
+    printf("\n");
     free(BWT);
     free(SA);
     free(LCP);
