@@ -7,6 +7,7 @@ We use the Burrows-Wheeler Transform (BWT), suffix array (SA) and longest common
 ## Build requirements
 
 Python3
+
 gcc
 
 ## Example
@@ -21,8 +22,12 @@ make
 
 ```sh
 -o  output converted file
--1	print the repeats
--2 	print the number of repeats and the maximum length
+-s  minimum repeat size
+-1	type 1
+-2 	type 2
+-r  repeats
+-si size and index
+-p  print
 -v	verbose output
 -h	this help message
 
@@ -34,28 +39,37 @@ _Notes:_
 **Run a test:**
 
 ```c
-./repeat example.txt -s 1 -1
+python3 main.py example.txt -s 1 -1 -2 -r --print
 ```
 
 **Output:**
 
 ```c
-Command line:
- ./remap -A 7 -v ../dataset/reads.fastq
-d = 10000
-N = 946583 bytes
-sizeof(int) = 4 bytes
-## RANDOM ##
-A: G
-C: N
-G: A
-N: C
-T: T
-##
-Number of Lyndon factors: 15
-Average length: 63105.53
-Maximum length: 605983
-##
-15	63105.53	605983
+ 1 -1 -2 -r --print
+Sending logging messages to file: example.txt.repeat.log
+## gsufsort ##
+## store_to_disk ##
+example.txt.4.sa 	76 bytes (n = 19)
+example.txt.4.lcp 	76 bytes (n = 19)
+example.txt.bwt 	19 bytes (n = 19)
+malloc_count ### exiting, total: 55.803, peak: 21.448, current: 1.144
+Elapsed time: 0.0017
+
+example.txt.type1
+example.txt.type2
+malloc_count ### exiting, total: 30.392, peak: 12.120, current: 10.222
+Elapsed time: 0.0024
+
+## Repeat DNA ##
+Type 1:
+anan
+ana
+an
+a
+ba
+
+Type 2:
+anan
+ba
 ```
 

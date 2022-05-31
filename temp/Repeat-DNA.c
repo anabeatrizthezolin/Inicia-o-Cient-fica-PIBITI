@@ -98,6 +98,7 @@ int main(){
                     }
                     omega[y] = '\0';
                     printf("%s\n", omega);
+                    printf("%d %d\n", rot[p[z].h].SA, l);
                     break;
                 }
             }
@@ -150,6 +151,7 @@ int main(){
                 }
                 omega[y] = '\0';
                 printf("%s\n", omega);
+                printf("%d %d\n", rot[p[z].a].SA, l);
             }
             l = p[z-1].l;
             for(int k = 0; k < 125; k++){
