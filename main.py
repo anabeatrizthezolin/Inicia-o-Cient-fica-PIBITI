@@ -3,9 +3,8 @@ import sys, time, argparse, subprocess, os.path, pathlib, shutil
 Description = """ Tool for identifying repeats in DNA strings
 
 For example
-    {exe} example.txt -o output -3 -4
-will produce the files output.one and output.two
-with the type 1 and type 2 repeats, respectively
+    {exe} example.txt -o output -1 -2 -r
+will produce the files output.type1 and output.type2 with the type 1 and type 2 repeats, respectively
 
 --------------------------
 Command line options:
@@ -14,6 +13,7 @@ Command line options:
 
 gsufsort_exe = 'external/gsufsort/gsufsort'
 repeat_exe = './repeat-dna'
+word_cloud_exe = "word_cloud.py"
 
 def main():
     parser = argparse.ArgumentParser(description=Description, formatter_class=argparse.RawTextHelpFormatter)
@@ -25,6 +25,8 @@ def main():
     parser.add_argument('-r',            help='repeats', action='store_true', default = True) 
     parser.add_argument('-si',           help='size and index', action='store_true')   
     parser.add_argument('-p', '--print', help='print', action='store_true', default = False)
+    parser.add_argument('-t', '--txt',   help='input as txt files', action='store_true', default = True)
+    parser.add_argument('-f', '--fast', help='input as fasta or fastq files', action='store_true', default = False)
     parser.add_argument('-v',            help='verbose: extra info in the log file',action='store_true')
     args = parser.parse_args()
     
@@ -57,26 +59,48 @@ def main():
         if(args.si):
             print(">>> size and index",file=logfile)
             op_p = 2
+
+        if(args.fast):
+            op_file = 1
+        else:
+            op_file = 0
+        file_type1 = sys.argv[1] + '.type1'
+        file_type2 = sys.argv[1] + '.type2'
+
+        print("\n{file1}\n{file2}".format(file1=file_type1, file2=file_type2), end = "")
         
-        print("\n{}\n{}".format(sys.argv[1] + '.type1', sys.argv[1] + '.type2'), end = "")
-        
-        step2(path, op, op_p, logfile)
+        step2(path, op, op_p, op_file, logfile, args)
 
         if(args.print):
             print_type(op)
 
+        if(op_p == 1):
+            word_cloud(path, op)
+            
 def step1(path, logfile):
     exe = os.path.join(path, gsufsort_exe)
-    command = "{exe} {ifile} --bwt --sa --lcp".format(exe = exe, ifile = sys.argv[1])
-    execute_command(command, logfile)
 
-def step2(path, op, op_p, logfile):
+    command = "{exe} {ifile} --output {output} --bwt --sa --lcp"\
+        .format(exe = exe, ifile = sys.argv[1], output=sys.argv[1])
+
+    execute_command(command)
+
+def step2(path, op, op_p, op_file, logfile, args):
     exe = os.path.join(path, repeat_exe)
     file_bwt = sys.argv[1] + '.bwt'
     file_sa = sys.argv[1] + '.4.sa'
     file_lcp = sys.argv[1] + '.4.lcp'
-    command = "{exe} {file_txt} {file_bwt} {file_sa} {file_lcp} {size} {op} {op_p}".format(exe=exe, file_txt=sys.argv[1], file_bwt=file_bwt, file_sa=file_sa, file_lcp=file_lcp, size=sys.argv[2], op=op, op_p=op_p)
-    execute_command(command, logfile)
+
+    command = "{exe} {file_txt} {file_bwt} {file_sa} {file_lcp} {size} {op} {op_p} {op_file}"\
+        .format(exe=exe, file_txt=sys.argv[1], file_bwt=file_bwt, file_sa=file_sa, \
+        file_lcp=file_lcp, size=(int)(args.size), op=op, op_p=op_p, op_file = op_file)
+    print(command)
+    execute_command(command)
+
+def word_cloud(path, op):
+    exe = os.path.join(path, word_cloud_exe)
+    command = "python3 {file} {ifile} {op}".format(file=exe, ifile=sys.argv[1], op=op)
+    subprocess.call(command, shell = True)
 
 def define_basename(args):
     if len(args.out)==0:
@@ -84,7 +108,7 @@ def define_basename(args):
     else:
         args.basename = args.out
 
-def execute_command(command, logfile):
+def execute_command(command):
     try:    
         start = time.time()
         subprocess.call(command, shell = True)
@@ -111,6 +135,7 @@ def print_type(op):
         for x in content:
             print(x, end = '')
         print("")
+
         print("Type 2:")
         with open(file_type2) as f:
             content = f.readlines()

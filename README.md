@@ -23,11 +23,13 @@ make
 ```sh
 -o  output converted file
 -s  minimum repeat size
--1	type 1
+-1  type 1
 -2 	type 2
 -r  repeats
 -si size and index
 -p  print
+-t  input as txt files
+-f  input as fasta orfastq files
 -v	verbose output
 -h	this help message
 
@@ -39,13 +41,12 @@ _Notes:_
 **Run a test:**
 
 ```c
-python3 main.py example.txt -s 1 -1 -2 -r --print
+python3 main.py example.txt -txt -s 1 -1 -2 -r --print
 ```
 
 **Output:**
 
 ```c
- 1 -1 -2 -r --print
 Sending logging messages to file: example.txt.repeat.log
 ## gsufsort ##
 ## store_to_disk ##
