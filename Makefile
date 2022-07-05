@@ -1,9 +1,9 @@
 CC = g++
-CFLAGS += -Wall 
+#CFLAGS += -Wall 
 CFLAGS += -g -O0
 CFLAGS += -D_FILE_OFFSET_BITS=64 -m64 -O3 -fomit-frame-pointer -Wno-char-subscripts 
 
-LFLAGS = -lm -lrt -ldl
+LFLAGS = -lm -lrt -ldl -lz
 
 INPUT = dataset/input.100.txt
 ALG = 10
@@ -13,7 +13,9 @@ LIBOBJ = \
 	
 CFLAGS += $(DEFINES)
 
-all: main 
+all:
+	make -C external/gsufsort/ 
+	make main  
 
 clean:
 	\rm -f *.o ../*.o ../external/*.o external/malloc_count/malloc_count.o lib/*o repeat-dna
