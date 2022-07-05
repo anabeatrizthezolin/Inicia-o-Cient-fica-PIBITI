@@ -6,15 +6,20 @@ We use the Burrows-Wheeler Transform (BWT), suffix array (SA) and longest common
 
 ## Build requirements
 
+gcc
+
 Python3
 
-gcc
+```sh
+pip install WordCloud
+```
 
 ## Example
 
 **Compilation:**
 
 ```sh
+git clone --recursive https://github.com/anabeatrizthezolin/Repeat-DNA.git
 make
 ```
 
