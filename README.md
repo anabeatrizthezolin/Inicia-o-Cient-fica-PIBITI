@@ -34,7 +34,7 @@ make
 -si size and index
 -p  print
 -t  input as txt files
--f  input as fasta orfastq files
+-f  input as fasta or fastq files
 -v	verbose output
 -h	this help message
 
@@ -46,7 +46,7 @@ _Notes:_
 **Run a test:**
 
 ```c
-python3 main.py example.txt -txt -s 1 -1 -2 -r --print
+python3 main.py example.txt --txt -s 1 -1 -2 -r --print
 ```
 
 **Output:**
