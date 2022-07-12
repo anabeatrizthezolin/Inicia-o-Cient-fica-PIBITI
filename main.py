@@ -3,7 +3,7 @@ import sys, time, argparse, subprocess, os.path, pathlib, shutil
 Description = """ Tool for identifying repeats in DNA strings
 
 For example
-    {exe} example.txt -o output -1 -2 -r
+    {exe} example.txt --txt -o output -s 1 -1 -2 -r --print
 will produce the files output.type1 and output.type2 with the type 1 and type 2 repeats, respectively
 
 --------------------------
@@ -13,7 +13,7 @@ Command line options:
 
 gsufsort_exe = 'external/gsufsort/gsufsort'
 repeat_exe = './repeat-dna'
-word_cloud_exe = "word_cloud.py"
+word_cloud_exe = 'word_cloud.py'
 
 def main():
     parser = argparse.ArgumentParser(description=Description, formatter_class=argparse.RawTextHelpFormatter)
@@ -26,14 +26,20 @@ def main():
     parser.add_argument('-si',           help='size and index', action='store_true')   
     parser.add_argument('-p', '--print', help='print', action='store_true', default = False)
     parser.add_argument('-t', '--txt',   help='input as txt files', action='store_true', default = True)
-    parser.add_argument('-f', '--fast', help='input as fasta or fastq files', action='store_true', default = False)
+    parser.add_argument('-f', '--fast',  help='input as fasta or fastq files', action='store_true', default = False)
     parser.add_argument('-v',            help='verbose: extra info in the log file',action='store_true')
     args = parser.parse_args()
     
     define_basename(args)
 
-    logfile_name = args.basename + ".repeat.log"
     path = os.path.split(sys.argv[0])[0]
+    path_inp = os.path.split(sys.argv[1])[0]
+
+    if(args.out): # all output files named args.out
+        logfile_name = os.path.join(path_inp, args.out) + ".repeat.log"
+    else:
+        logfile_name = args.basename + ".repeat.log"
+
     print("Sending logging messages to file:", logfile_name)
 
     with open(logfile_name,"a") as logfile:
@@ -41,7 +47,16 @@ def main():
         show_command_line(logfile)
         logfile.flush()
         
-        step1(path, logfile)
+        if(args.out): # all output files named args.out
+            file_type1 = os.path.join(path_inp, args.out) + '.type1'
+            file_type2 = os.path.join(path_inp, args.out) + '.type2'
+            file_out = os.path.join(path_inp, args.out)
+        else:
+            file_type1 = sys.argv[1] + '.type1'
+            file_type2 = sys.argv[1] + '.type2'
+            file_out = sys.argv[1]
+
+        step1(path, logfile, file_out)
 
         op = 0
         if(args.si): 
@@ -64,43 +79,38 @@ def main():
             op_file = 1
         else:
             op_file = 0
-        file_type1 = sys.argv[1] + '.type1'
-        file_type2 = sys.argv[1] + '.type2'
-
-        print("\n{file1}\n{file2}".format(file1=file_type1, file2=file_type2), end = "")
         
-        step2(path, op, op_p, op_file, logfile, args)
+        step2(path, op, op_p, op_file, logfile, args, file_out)
 
         if(args.print):
-            print_type(op)
+            print_type(op, file_out)
 
         if(op_p == 1):
             word_cloud(path, op)
             
-def step1(path, logfile):
+def step1(path, logfile, file_out):
     exe = os.path.join(path, gsufsort_exe)
 
     command = "{exe} {ifile} --output {output} --bwt --sa --lcp"\
-        .format(exe = exe, ifile = sys.argv[1], output=sys.argv[1])
-
+        .format(exe = exe, ifile = sys.argv[1], output=file_out)
     execute_command(command)
 
-def step2(path, op, op_p, op_file, logfile, args):
+def step2(path, op, op_p, op_file, logfile, args, file_out):
     exe = os.path.join(path, repeat_exe)
-    file_bwt = sys.argv[1] + '.bwt'
-    file_sa = sys.argv[1] + '.4.sa'
-    file_lcp = sys.argv[1] + '.4.lcp'
+    file_bwt = file_out + '.bwt'
+    file_sa = file_out + '.4.sa'
+    file_lcp = file_out + '.4.lcp'
 
-    command = "{exe} {file_txt} {file_bwt} {file_sa} {file_lcp} {size} {op} {op_p} {op_file}"\
+    command = "{exe} {file_txt} {file_bwt} {file_sa} {file_lcp} {size} {op} {op_p} {op_file} {file_out}"\
         .format(exe=exe, file_txt=sys.argv[1], file_bwt=file_bwt, file_sa=file_sa, \
-        file_lcp=file_lcp, size=(int)(args.size), op=op, op_p=op_p, op_file = op_file)
+        file_lcp=file_lcp, size=(int)(args.size), op=op, op_p=op_p, op_file = op_file, file_out=file_out)
     print(command)
     execute_command(command)
 
 def word_cloud(path, op):
     exe = os.path.join(path, word_cloud_exe)
     command = "python3 {file} {ifile} {op}".format(file=exe, ifile=sys.argv[1], op=op)
-    subprocess.call(command, shell = True)
+    #subprocess.call(command, shell = True)
 
 def define_basename(args):
     if len(args.out)==0:
@@ -124,7 +134,7 @@ def show_command_line(f):
         f.write(x+" ")
     f.write("\n") 
 
-def print_type(op):
+def print_type(op, file_out):
     print("\n## Repeat DNA ##")
     if(op == 0):
         file_type1 = sys.argv[1] + '.type1'
@@ -143,7 +153,7 @@ def print_type(op):
             print(x, end = '')
 
     elif(op == 1):
-        file_type1 = sys.argv[1] + '.type1'
+        file_type1 = file_out + '.type1'
         print("Type 1:")
         with open(file_type1) as f:
             content = f.readlines()
@@ -151,7 +161,7 @@ def print_type(op):
             print(x, end = '')
 
     elif(op == 2):
-        file_type2 = sys.argv[1] + '.type2'
+        file_type2 = file_out + '.type2'
         print("Type 2:")
         with open(file_type2) as f:
             content = f.readlines()
