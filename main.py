@@ -86,7 +86,7 @@ def main():
             print_type(op, file_out)
 
         if(op_p == 1):
-            word_cloud(path, op)
+            word_cloud(path, op, file_out)
             
 def step1(path, logfile, file_out):
     exe = os.path.join(path, gsufsort_exe)
@@ -104,13 +104,12 @@ def step2(path, op, op_p, op_file, logfile, args, file_out):
     command = "{exe} {file_txt} {file_bwt} {file_sa} {file_lcp} {size} {op} {op_p} {op_file} {file_out}"\
         .format(exe=exe, file_txt=sys.argv[1], file_bwt=file_bwt, file_sa=file_sa, \
         file_lcp=file_lcp, size=(int)(args.size), op=op, op_p=op_p, op_file = op_file, file_out=file_out)
-    print(command)
     execute_command(command)
 
-def word_cloud(path, op):
+def word_cloud(path, op, file_out):
     exe = os.path.join(path, word_cloud_exe)
-    command = "python3 {file} {ifile} {op}".format(file=exe, ifile=sys.argv[1], op=op)
-    #subprocess.call(command, shell = True)
+    command = "python3 {file} {ifile} {op}".format(file=exe, ifile=file_out, op=op)
+    subprocess.call(command, shell = True)
 
 def define_basename(args):
     if len(args.out)==0:
@@ -137,8 +136,8 @@ def show_command_line(f):
 def print_type(op, file_out):
     print("\n## Repeat DNA ##")
     if(op == 0):
-        file_type1 = sys.argv[1] + '.type1'
-        file_type2 = sys.argv[1] + '.type2'
+        file_type1 = file_out + '.type1'
+        file_type2 = file_out + '.type2'
         print("Type 1:")
         with open(file_type1) as f:
             content = f.readlines()
