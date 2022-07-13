@@ -103,7 +103,7 @@ int main(int argc, char *argv[]){
         T = (char*)malloc(sizeof(char)*(n+1));
         int ret = fread(T, sizeof(char), n, f);
         T[n]='\0';
-        if(ret != n){
+        if(ret+1 != n){
             printf("Error reading file %s\n", argv[1]);
         }
         fclose(f);  
