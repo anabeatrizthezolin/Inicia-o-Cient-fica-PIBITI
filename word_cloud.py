@@ -9,19 +9,12 @@ import sys
 def main():
     op = int(sys.argv[2])
 
-    print(sys.argv[1])
-    # Reads file
-    if(op == 1 or op == 0):
-        file_type1 = sys.argv[1] + '.type1'
-        wordcloud1 = plot(file_type1)
-    
-    if(op == 2 or op == 0):
-        file_type2 = sys.argv[1] + '.type2'
-        wordcloud2 = plot(file_type2)
-
-    # plot the WordCloud image                      
+    ###### plot the WordCloud image #######                      
     fig = plt.figure(figsize = (9,5), facecolor = None)
     if(op == 1 or op == 0):
+        ###### Reads file #######
+        file_type1 = sys.argv[1] + '.type1'
+        wordcloud1 = plot(file_type1)
         if(op == 0):
             fig.add_subplot(1, 2, 1)
         plt.imshow(wordcloud1)
@@ -30,6 +23,9 @@ def main():
         plt.title("Type 1", fontsize=15) 
 
     if(op == 2 or op == 0):
+        ###### Reads file #######
+        file_type2 = sys.argv[1] + '.type2'
+        wordcloud2 = plot(file_type2)
         if(op == 0):
             fig.add_subplot(1, 2, 2)
         plt.imshow(wordcloud2)
