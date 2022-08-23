@@ -98,6 +98,5 @@ Type 2:
 3 TTG
 ```
 
-<a href="http://simongog.github.io/assets/data/word_cloud.html" >
 <img align="right" src="resources/word_cloud.png?raw=true" />
 </a>
