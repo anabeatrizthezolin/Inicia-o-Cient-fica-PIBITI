@@ -18,7 +18,8 @@ all:
 	make main  
 
 clean:
-	\rm -f *.o ../*.o ../external/*.o external/malloc_count/malloc_count.o lib/*o repeat-dna
+	\rm -f *.o ../*.o ../external/*.o external/malloc_count/malloc_count.o lib/*o repeat-dna 
+	\rm dataset/*.type1 dataset/*.type2 dataset/*.4.lcp dataset/*.4.sa dataset/*.bwt dataset/*.repeat.log dataset/*.png
 
 main: Repeat-DNA.cpp ${LIBOBJ} 
 	$(CC) -o repeat-dna Repeat-DNA.cpp ${LIBOBJ} $(CFLAGS) $(LFLAGS) 

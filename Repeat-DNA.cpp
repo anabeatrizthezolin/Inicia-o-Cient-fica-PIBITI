@@ -22,14 +22,13 @@ int open(char *arq, int n, int *ARQ){
 }
 
 /////// save repeats in .type1 and .type2 files ///////
-char repeat(int j, int l, char *T, int n, char *omega){
-    int y = 0;
+string repeat(int j, int l, char *T, int n){
+    string omega;
     for(int i = j; i < j+l; i++){
-        omega[y] = T[i];
-        y++;
+        omega+=T[i];
     }
-    omega[y] = '\0';
-    return *omega;
+    omega+='\0';
+    return omega;
 }
 
 ///////  ///////
@@ -117,26 +116,27 @@ int main(int argc, char *argv[]){
 
     FILE *fi = fopen(argv[2], "rb"); // rb to binary files
     char *BWT = (char*)malloc(sizeof(char)*(n+1));
-    int retn = fread(BWT, sizeof(char), n, fi);
-    if(retn != n){
-        printf("Error reading file %s\n", argv[2]);
+
+    for(int i=0; i<n; i++){
+        char aux;
+        if(fread(&aux, sizeof(char), 1, fi) == 0){
+            printf("Error reading file %s\n", argv[2]);
+            exit(0);
+        }
+
+
+        if(aux==0) BWT[i]='#';
+        else BWT[i] = (aux==1)?'$':aux;
     }
+    BWT[n]='\0';
     fclose(fi);
-    printf("\n%s\n", BWT);
 
     int *SA = (int*)malloc(sizeof(int)*(n+1));
     open(argv[3], n, SA);
     int *LCP = (int*)malloc(sizeof(int)*(n+1));
     open(argv[4], n, LCP);
     LCP[n] = 0;
-    for(int i = 0; i < n; i++){
-        printf("%d ", LCP[i]);
-    }
-    printf("\n");
-    for(int i = 0; i < n; i++){
-        printf("%d ", SA[i]);
-    }
-    printf("\n");
+    
     /////// data stack /////// 
     stack <int> a;
     stack <int> l;
@@ -155,7 +155,7 @@ int main(int argc, char *argv[]){
         char *type1 = (char*)".type1";
         *file_type = print(k, file_type, file_out, type1);
         fi = fopen(file_type, "wb");
-        
+        string anterior = "\0";
         for(int i = 0; i <= n; i++){
             if((LCP[i] == l_input && LCP[i-1] < l_input) || LCP[i] > l_input){
                 a.push(i-1);
@@ -166,18 +166,20 @@ int main(int argc, char *argv[]){
                 }
             }
             else if(LCP[i] < l_input && a.size() > 1){
+                
                 for(int k = a.top(); k < i; k++){ // i == b+1
                     add[BWT[k]]++;
                     if(add[BWT[k]] == 1 && k > a.top()){
-
+                        int q = (i - 1) - a.top() + 1; //q = b - a + 1
+                        
                         if(op_p == 1){
-                            int q = (i - 1) - a.top() + 1; //q = b - a + 1
-                            char *omega = (char*)malloc(sizeof(char)*(l_input+1));
-                            *omega = repeat(SA[h.top()], l_input, T, n, omega);
-                            fprintf(fi, "%d %s\n", q, omega);
+                            string omega = repeat(SA[h.top()], l_input, T, n);
+                            if(omega!=anterior)
+                                fprintf(fi, "%d %s\n", q, omega.c_str());
+                            anterior=omega;
                         }   
                         else if(op_p == 2){
-                            fprintf(fi, "%d, %d\n", SA[h.top()], l_input);
+                            fprintf(fi, "%d %d %d\n", q, SA[h.top()], l_input);
                         }
                         break;
                     }
@@ -187,7 +189,12 @@ int main(int argc, char *argv[]){
                 l.pop();
                 h.pop();
                 if(LCP[i] >= l.top()){
-                    a.push(aux_a);
+                    if(a.size() > 1){
+                        a.push(a.top());
+                    }
+                    else{
+                       a.push(aux_a); 
+                    }
                     l.push(LCP[i]);
                     h.push(i);
                     l_input = LCP[i];
@@ -229,20 +236,20 @@ int main(int argc, char *argv[]){
                 int tipo2 = 1;
                 for(int k = a.top(); k < i; k++){ //i == b+1
                     add[BWT[k]]++;
-                    if(add[BWT[k]] > 1 && add[BWT[k]] != ' '){
+                    if(add[BWT[k]] > 1 && (int)BWT[k] != 36){
                         tipo2 = 0;
                         break;
                     }
                 }
                 if(tipo2 == 1){
+                    int q = (i - 1) - a.top() + 1; //q = b - a + 1
+
                     if(op_p == 1){
-                        int q = (i - 1) - a.top() + 1; //q = b - a + 1
-                        char *omega = (char*)malloc(sizeof(char)*(l_input+1));
-                        *omega = repeat(SA[a.top()], l_input, T, n, omega);
-                        fprintf(fi, "%d %s\n", q, omega);
+                        string omega = repeat(SA[a.top()], l_input, T, n);
+                        fprintf(fi, "%d %s\n", q, omega.c_str());
                     }   
                     else if(op_p == 2){
-                        fprintf(fi, "%d, %d\n", SA[a.top()], l_input);
+                        fprintf(fi, "%d %d %d\n",  q, SA[a.top()], l_input);
                     }      
                 }
                 a.pop();

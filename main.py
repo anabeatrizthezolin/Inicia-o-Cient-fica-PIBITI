@@ -1,4 +1,5 @@
 import sys, time, argparse, subprocess, os.path, pathlib, shutil
+from xml.etree.ElementInclude import default_loader
 
 Description = """ Tool for identifying repeats in DNA strings
 
@@ -18,15 +19,16 @@ word_cloud_exe = 'word_cloud.py'
 def main():
     parser = argparse.ArgumentParser(description=Description, formatter_class=argparse.RawTextHelpFormatter)
     parser.add_argument('input',         help='input file name', type=str, nargs='+')
-    parser.add_argument('-o','--out',    help='output base name (def. input base name)', default="", type=str)  
-    parser.add_argument('-s','--size',   help='minimum repeat size', default=-1, type=int)
-    parser.add_argument('-1', '--p1',    help='print 1: type 1', action='store_true', default = False)
-    parser.add_argument('-2', '--p2',    help='print 2: type 2', action='store_true', default = False)
-    parser.add_argument('-r',            help='repeats', action='store_true', default = True) 
-    parser.add_argument('-si',           help='size and index', action='store_true')   
-    parser.add_argument('-p', '--print', help='print', action='store_true', default = False)
     parser.add_argument('-t', '--txt',   help='input as txt files', action='store_true', default = True)
     parser.add_argument('-f', '--fast',  help='input as fasta or fastq files', action='store_true', default = False)
+    parser.add_argument('-o','--output', help='output base name (def. input base name)', default="", type=str)  
+    parser.add_argument('-1', '--p1',    help='print 1: repeats type 1', action='store_true', default = False)
+    parser.add_argument('-2', '--p2',    help='print 2: repeats type 2', action='store_true', default = False)
+    parser.add_argument('-r',            help='frequence and repeats', action='store_true', default = True) 
+    parser.add_argument('-si',           help='frequence, size and index', action='store_true')   
+    parser.add_argument('-s','--size',   help='minimum repeat size', default=-1, type=int)
+    parser.add_argument('-p', '--print', help='print', action='store_true', default = False)
+    parser.add_argument('-k',            help='number of repetitions of Word Cloud', type=int, default = False)
     parser.add_argument('-v',            help='verbose: extra info in the log file',action='store_true')
     args = parser.parse_args()
     
@@ -35,7 +37,7 @@ def main():
     path = os.path.split(sys.argv[0])[0]
     path_inp = os.path.split(sys.argv[1])[0]
 
-    if(args.out): # all output files named args.out
+    if(args.output): # all output files named args.out
         logfile_name = os.path.join(path_inp, args.out) + ".repeat.log"
     else:
         logfile_name = args.basename + ".repeat.log"
@@ -47,10 +49,10 @@ def main():
         show_command_line(logfile)
         logfile.flush()
         
-        if(args.out): # all output files named args.out
-            file_type1 = os.path.join(path_inp, args.out) + '.type1'
-            file_type2 = os.path.join(path_inp, args.out) + '.type2'
-            file_out = os.path.join(path_inp, args.out)
+        if(args.output): # all output files named args.out
+            file_type1 = os.path.join(path_inp, args.output) + '.type1'
+            file_type2 = os.path.join(path_inp, args.output) + '.type2'
+            file_out = os.path.join(path_inp, args.output)
         else:
             file_type1 = sys.argv[1] + '.type1'
             file_type2 = sys.argv[1] + '.type2'
@@ -85,8 +87,14 @@ def main():
         if(args.print):
             print_type(op, file_out)
 
+
+        if(args.k):
+            op_k = (int)(args.k)
+        else:
+            op_k = 100
+        
         if(op_p == 1):
-            word_cloud(path, op, file_out)
+            word_cloud(path, op, file_out, op_k, path_inp)
             
 def step1(path, logfile, file_out):
     exe = os.path.join(path, gsufsort_exe)
@@ -106,16 +114,16 @@ def step2(path, op, op_p, op_file, logfile, args, file_out):
         file_lcp=file_lcp, size=(int)(args.size), op=op, op_p=op_p, op_file = op_file, file_out=file_out)
     execute_command(command)
 
-def word_cloud(path, op, file_out):
+def word_cloud(path, op, file_out, op_k, path_inp):
     exe = os.path.join(path, word_cloud_exe)
-    command = "python3 {file} {ifile} {op}".format(file=exe, ifile=file_out, op=op)
+    command = "python3 {file} {ifile} {op} {op_k} {path}".format(file=exe, ifile=file_out, op=op, op_k=op_k, path=path_inp)
     subprocess.call(command, shell = True)
 
 def define_basename(args):
-    if len(args.out)==0:
+    if len(args.output)==0:
         args.basename = args.input[0]
     else:
-        args.basename = args.out
+        args.basename = args.output
 
 def execute_command(command):
     try:    
@@ -135,9 +143,8 @@ def show_command_line(f):
 
 def print_type(op, file_out):
     print("\n## Repeat DNA ##")
-    if(op == 0):
+    if(op == 1 or op == 0):
         file_type1 = file_out + '.type1'
-        file_type2 = file_out + '.type2'
         print("Type 1:")
         with open(file_type1) as f:
             content = f.readlines()
@@ -145,21 +152,7 @@ def print_type(op, file_out):
             print(x, end = '')
         print("")
 
-        print("Type 2:")
-        with open(file_type2) as f:
-            content = f.readlines()
-        for x in content:
-            print(x, end = '')
-
-    elif(op == 1):
-        file_type1 = file_out + '.type1'
-        print("Type 1:")
-        with open(file_type1) as f:
-            content = f.readlines()
-        for x in content:
-            print(x, end = '')
-
-    elif(op == 2):
+    if(op == 2 or op == 0):
         file_type2 = file_out + '.type2'
         print("Type 2:")
         with open(file_type2) as f:
