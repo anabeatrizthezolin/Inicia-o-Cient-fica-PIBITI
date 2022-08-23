@@ -98,5 +98,5 @@ Type 2:
 3 TTG
 ```
 
-<img align="right" src="resources/Word_Cloud.png?raw=true" />
+<img align="center" src="resources/Word_Cloud.png?raw=true" />
 </a>
