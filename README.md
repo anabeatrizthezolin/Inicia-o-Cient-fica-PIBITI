@@ -31,14 +31,14 @@ make
 -f  input as fasta or fastq files
 -o  output converted file
 -1  type 1
--2 	type 2
+-2  type 2
 -r  repeats
 -si size and index
 -s  minimum repeat size
 -p  print
 -k  number of repetitions of _Word_ _Cloud_
--v	verbose output
--h	this help message
+-v  verbose output
+-h  this help message
 
 ```
 _Notes:_ 
