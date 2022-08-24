@@ -8,7 +8,9 @@ We use the Burrows-Wheeler Transform (BWT), suffix array (SA) and longest common
 
 gcc
 
-Python3
+python3
+
+make
 
 ```sh
 pip install WordCloud
