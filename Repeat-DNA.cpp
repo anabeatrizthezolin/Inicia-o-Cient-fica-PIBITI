@@ -171,16 +171,16 @@ int main(int argc, char *argv[]){
                     add[BWT[k]]++;
                     if(add[BWT[k]] == 1 && k > a.top()){
                         int q = (i - 1) - a.top() + 1; //q = b - a + 1
-                        
+                        string omega = repeat(SA[h.top()], l_input, T, n);
                         if(op_p == 1){
-                            string omega = repeat(SA[h.top()], l_input, T, n);
                             if(omega!=anterior)
                                 fprintf(fi, "%d %s\n", q, omega.c_str());
-                            anterior=omega;
                         }   
                         else if(op_p == 2){
-                            fprintf(fi, "%d %d %d\n", q, SA[h.top()], l_input);
+                            if(omega!=anterior)
+                                fprintf(fi, "%d %d %d\n", q, SA[h.top()], l_input);
                         }
+                        anterior=omega;
                         break;
                     }
                 }
