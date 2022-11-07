@@ -38,7 +38,7 @@ def main():
     path_inp = os.path.split(sys.argv[1])[0]
 
     if(args.output): # all output files named args.out
-        logfile_name = os.path.join(path_inp, args.out) + ".repeat.log"
+        logfile_name = os.path.join(path_inp, args.output) + ".repeat.log"
     else:
         logfile_name = args.basename + ".repeat.log"
 
